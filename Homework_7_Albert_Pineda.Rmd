@@ -1,0 +1,332 @@
+---
+title: "Homework 7"
+author: "Alberto Pineda"
+date: "2023-06-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Question 1
+Many airlines use surveys to collect data on customer satisfaction related to
+flight experiences. Completing a flight, customers receive an email asking them
+to rate a variety of factors, including the reservation process, the check-in
+process, luggage policy, cleanliness of gate area, service by flight attendants,
+food/beverage selection, on-time arrival, and so on. Suppose that a five-point
+scale, with Excellent (E), Very Good (V), Good (G), Fair (F), and Poor (P),
+is used to record customer ratings. Assume that passengers on a Delta Airlines
+flight from Myrtle Beach, South Carolina, to Atlanta, Georgia, provided the
+following ratings for the question, “Please rate the airline based on your over-
+all experience with this flight.” The sample ratings are shown on the CSV file
+Homework 7 - Question 1. Create a bar chart using either the Base R or the
+ggplot2 package and create a visual summary of the overall satisfaction ratings.
+What insights can you gain from the bar plot?
+```{r}
+question1 <- read.csv("homework_7_question_1.csv")
+
+frequency <- table(question1)
+frequency <- sort(frequency, decreasing = TRUE)
+barplot(frequency, main = "Bar Chart for Customer Experience",
+        ylab = "Number of Respondents", col = "blue",
+        ylim = c(0, 30))
+abline(h = 0, lwd = 2)
+
+## From this Bar Chart, we can see that an overhwelming amount of customers had a Very good experience or excellent experience. As an airline it shows that we have room to improve because most customers did not have an excellent experience. What is good, is that there were few customers in the poor or fair categories, meaning very few customers had negative experiences on this flight. 
+```
+### Question 2
+In order to diversify risk, investors are often encouraged to invest in assets
+whose returns have either a negative relationship or no relationship. The data
+set Homework 7 - Question 2 shows a portion of the annual returns (in %) for
+two assets over the past 20 years. Construct a scatterplot of Return B against
+Return A. In order to diversify risk, would the investor be wise to include both of
+these assets in her portfolio? The data set is available on the CSV file Homework
+7 - Question 2. Create the chart using either the Base R or the ggplot2 package.
+```{r}
+returns <- read.csv("homework_7_question_2.csv")
+View(returns)
+return_A <- returns$Return.A
+return_B <- returns$Return.B
+Year <- returns$Year
+
+plot(x = Year, y = return_A,
+     col = "blue",
+     xlab = "Year",
+     ylab = "Return A",
+     main = "Returns over time")
+points(Year, return_B,
+       col = "green")
+legend("topleft", legend = c("Return A", "Return B"),
+       col = c("blue", "green"),
+       lty = 1,
+       cex = 0.5)
+## This scatterplot shows that Return B overtime has stayed much mose consistent in its returns while Return A has varied significantly in the amount of returns over time. If an investor wants a consistent and predictable returns it would be wise to only keep Return B. If they want potential for high returns it would be better to keep Return A. 
+```
+### Question 3
+The annual incomes for a sample of 200 first-year accountants were recorded.
+Draw a histogram and describe its shape. The data set is available on the CSV
+file Homework 7 - Question 3. Create the chart using either the Base R or the
+ggplot2 package
+
+```{r}
+library(ggplot2)
+incomes <- read.csv("homework_7_question_3.csv")
+incomes$Incomes <- gsub(",","", incomes$Incomes)
+incomes$Incomes <- as.numeric(incomes$Incomes)
+
+
+ggplot(incomes, aes(x = Incomes)) +
+  geom_histogram(aes(color=Incomes, fill=Incomes), 
+                 position = "identity", bins = 5, alpha = 0.5) +
+  labs(title = 'Frequency of Income',
+       x = 'Income',
+       y = 'Frequency') +
+  scale_color_manual(values = c('#0000FF75', '#B2222275')) +
+  scale_fill_manual(values = c('#0000FF75', '#B2222275')) +
+  theme(legend.position = "bottom", 
+        plot.title = element_text(hjust = 0.5))
+
+### From this histogram we can see that a large majority of individuals fall within the 50,000 income to to 55,000 income. There are very few individuals that report a salary above 70,000. This distribution has a right skew to it and is not a normal distribution
+```
+### Question 4
+The data set shows the median household income (Income in $) and median
+house value (House Value in $) for the 50 states. The data set is available on
+the CSV file Homework 7 - Question 4.
+a) Construct a boxplot for household income and use it to identify outliers, if
+any, and comment on skewness.
+b) Construct a boxplot for median house value and use it to identify outliers,
+if any, and comment on skewness.
+Create the charts using either the Base R or the ggplot2 package.
+
+```{r}
+home <- read.csv("homework_7_question_4.csv")
+median_income <- home$Income
+median_value <- home$Value
+
+boxplot(median_income, horizontal = TRUE, 
+        main = "Boxplot for Median Household Income",
+        xlab = "Income ($)")
+
+boxplot(median_value, horizontal = TRUE, 
+        main = "Boxplot for Median Household Value",
+        xlab = "Value ($)")
+
+home$z_scores_median_value <- (median_value - mean(median_value))/sd(median_value)
+z_scores_median_value <- home$z_scores_median_value
+home$Outliers_z <- ifelse(abs(z_scores_median_value) > 3, "Yes", "No")
+home
+
+Q3_Median_Value <- quantile(median_value, 0.75)
+Q1_Median_Value <- quantile(median_value,0.25)
+IQR_Median_Value <- Q3_Median_Value - Q1_Median_Value
+home$Outliers_IQR_Median_Value <- ifelse(median_value >= Q3_Median_Value +1.5*IQR_Median_Value, "Yes","No")
+home
+## In regards to Median Household income, there do not appear to be any outliers according to our boxplot. In regards to Median House value, there are at least 2 values that are outliers. Through additional calculation we can confirm the two outliers in median house value as being California and Hawaii.
+
+```
+### Question 5
+The monthly value of U.S. exports to China (in $ millions) and imports from
+China from 1985 to 2016 was recorded. The data set is available on the CSV
+file Homework 7 - Question 5.
+a) Draw a line chart of U.S. exports to China.
+b) Draw a line chart of U.S. imports from China.
+c) Calculate the trade balance and draw a line chart.
+d) What do all the charts reveal?
+Create the charts using either the Base R or the ggplot2 package.
+```{r}
+import_exports <- read.csv("homework_7_question_5.csv")
+str(import_exports)
+exports <- import_exports$U.S..Exports.to.China
+imports <- import_exports$U.S..Imports.from.China
+Year <- import_exports$Year
+View(import_exports)
+import_exports$trade_balance <- imports - exports
+View(import_exports)
+Balance <- import_exports$trade_balance
+plot(imports~Year, type="l" , col = "blue", xlab = "Year", 
+     ylab = "Billions of Dollars")
+lines(exports~Year, type="l", col = "red")
+lines(Balance~Year, type="l", col = "green")
+title(main = "US & China Trade")
+legend("topleft", legend = c("Imports", "Exports","Trade Balance"),
+       col = c("blue", "red","green"),
+       lty = 1,
+       cex = 0.7)
+### These charts show us that the amount imported into the US from china is substantially higher than what is exported. From the trade balance we can see it only slightly shifted down due to the sheer difference in imports versus exports. It is clear that while both have increased over time, the trade balance has continued to shift towards imports over time. 
+```
+### Question 6
+Does it matter which shelf a popular brand is placed on? It certainly might,
+because we tend to purchase items that are easiest to see. To test this, suppose
+that Midway is a large chain of supermarket stores with many stores in many
+locations. Midway selects 125 of these stores for an experiment. Specifically, it
+selects these particular 125 stores to be as alike as possible, so that store size,
+amount of customer traffic, types of customers, and other characteristics are as
+similar across stores as possible. Each store stocks cereal in a similar location in
+the store on five-shelf displays. In the experiment, 25 randomly selected stores
+place a particular popular brand of cereal—we’ll call it Brand X—on the lowest
+shelf for a month. Another randomly selected 25 stores place Brand X on the
+next-to-lowest shelf, another 25 place it on the middle shelf, another 25 place
+it on the next-to-highest shelf, and the final 25 place it on the highest shelf.
+Then the number of boxes of Brand X sold is recorded at each of the stores
+for the last two weeks of the experiment. (The first two weeks allow customers
+to get used to the shelving arrangement.) Does shelf height appear to make a
+difference in sales? Create a side-by-side box plot and share your insights. The
+data set is available on the CSV file Homework 7 - Question 6. Hint: You will
+have to first stack the data. Create the boxplots using either the Base R or the
+ggplot2 package.
+
+```{r}
+library(tidyverse)
+midway <- read.csv("homework_7_question_6.csv")
+View(midway)
+
+stacked_midway <- gather(midway, key = "Shelf Location", value = "Value")
+View(stacked_midway)
+
+shelf <- stacked_midway$`Shelf Location`
+value <- stacked_midway$Value
+
+boxplot(value~shelf,
+        main="Sales by Shelf Location",
+        horizontal = FALSE,
+        xlab="Shelf Location",
+        ylab="Sales",
+        col="green",
+        border="black")
+## The boxplots show that there may be a difference between Height. When looking at the mean for "Next to highest" you can see that its mean is higher than "Lowest" by a significant margin. Suggesting that height may play an impact on the sales of items. 
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

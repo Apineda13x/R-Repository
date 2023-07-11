@@ -1,0 +1,182 @@
+---
+title: "Homework 6"
+author: "Alberto Pineda"
+date: "2023-05-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Question 1
+A)in surveys, rich people are more likely to not disclose their income.
+
+This is Missing Not at Random (MNAR) because the income is missing due to the value of rich or not, therefor the value itself.
+
+B)While manually labeling data, the labeler accidentally left some entries missing
+
+This is Missing Completely At Random(MCAR) because the chance of a variable missing is unrelated to the other variables and due to the randomness of the labeler.
+
+C)In a health survey, you see missing data on weight. You suspect the values
+for the weight variable to be missing for one gender over another.
+
+This is Missing at Random(MAR), because the missing data is related to another observed data. 
+
+### Question 2 A)
+Run a model explaining earnings using country, year, and sub type vari-
+ables. Save the result to model 1. Write the code to summarize model 1.
+Fit another regression model to explain earnings, this time also including
+sub race among the explanatory variables used in model 1; assign the re-
+sult to model 2. Write the code to summarize model 2. Are the two models
+comparable? If not, why not? Write your answer to this question as a part
+of the R code. You will have to comment this part of the code so that it
+doesn’t run when you run the other R code. See the instructions on the first
+page on how to comment the R code.
+```{r}
+library(dplyr)
+biopics <- read.csv("homework_6_biopics.csv")
+model_1 <- lm(earnings ~ country + year + sub_type, data = biopics)
+summary(model_1)
+model_2 <- lm(earnings ~ country + year + sub_type + sub_race, data = biopics)
+summary(model_2)
+## Model_1 Indicates a large variance between the data sets due to a t value of -2.7, while Model_2 has a T value of -0.4 which would indicate less differences in the sample. The intercept in Model_1 is -743 with a standard deviation of 273, while Model_2 has a -139 Intercept and a larger standard deviation of 287. While the two models are similar, due to the higher amount of data in model_2, I would say they are not entirely comparable. The multiple R squared of model_1 is .17 or 17% which means it can only explain 17% of the dependent variables with the independent variables, while model_2 has an R squared of .25, suggesting it can explain 25% of the dependent variables with the independent variables. This suggest that model_2 is more accurate than model_1.
+```
+### Question 2 B)
+We covered in the async that of the three missing value mechanisms, MAR is
+the most important one to detect because the imputation techniques assume
+the data are MAR. In this part, the goal is to test whether the number of
+missing values in earnings differs per subject’s gender. Prepare the data for
+the t-test.
+• First, create a dummy variable indicating missingness in earnings called
+missing earnings that is TRUE if earnings is missing and FALSE other-
+wise.
+• Then, you will split it per gender by first filtering the data to keep one
+of the genders, and then pulling the dummy variable. Create a vector of
+missing earnings values for males and assign it to missing earnings males.
+Create a vector of missing earnings values for females and assign it to
+missing earnings females.
+```{r}
+biopics$missing_earnings <- is.na(biopics$earnings)
+View(biopics)
+
+missing_earnings_males <- biopics %>%
+  filter(sub_sex == "Male") %>%
+  pull(missing_earnings)
+missing_earnings_females <- biopics %>%
+  filter(sub_sex == "Female") %>%
+  pull(missing_earnings)
+t_test <- t.test(missing_earnings_males, missing_earnings_females)
+t_test
+
+### In this instance because my P value is .26 > .05 I fail to reject the null hypothesis. This means that there is not enough evidence to suggest that the means are different, therfore I cannot say that the data is MAR with respect to the subjects gender. Therefore the % of values missing for males and females are the same. 
+```
+### Question 2 C)
+In which combinations of variables the data are missing, and how often? To
+obtain this high-level overview of missingness patterns, create an aggrega-
+tion plot. What do you conclude? Write your response as a comment as a
+part of the R code submission. See the instructions on the first page on how
+to comment the R code.
+
+```{r}
+library(VIM)
+biopics %>%
+  aggr(combined = TRUE, numbers = TRUE) # Display the plot
+summary(aggr(biopics, plot = TRUE))
+### Most of the missing values are attributed to two columns, earnings and sub_races.  over 40% of missing values are attributed to earnings with the remaining attributed to sub_race. .1 of combinations are earnings and sub_races
+```
+### Question 2 D)
+The aggregation plot you have drawn in the previous part gave you some
+high-level overview of the missing data. If you are interested in the inter-
+action between specific variables, a spine plot is called for. It allows us to
+study the percentage of missing values in one variable for different values
+of the other. Draw a spine plot to investigate the percentage of missing
+data in earnings for different categories of sub race. 
+Based on the spine plot, what is the scarcest race? 
+And the missing earnings amount to what percent of the data? Write your response as a comment as a part of the R
+code submission. See the instructions on the first page on how to comment
+the R code
+
+```{r}
+biopics %>%
+  select(sub_race, earnings) %>%
+  spineMiss()
+## The scarcest race in relation to # of variables is Asian, while the scarcest race as a % of missing values in earnings is African. The missing earnings accounts for approximately over 40% of the data. 
+```
+### Question 3 A)
+Perform mean imputation on air temp. Assess the quality of the mean im-
+putation using the margin plot by examining the correlation of the imputed
+air temp variable on X with sea surface temp on Y 
+
+```{r}
+tao <- read.csv("homework_6_tao.csv")
+tao_imp <- tao %>%
+  mutate(tao_air_imp = ifelse(is.na(air_temp), T, F)) %>%
+  mutate(air_temp = ifelse(is.na(air_temp), mean(air_temp, na.rm = TRUE), air_temp)) 
+View(tao_imp)
+tao_imp %>%
+  select(air_temp, sea_surface_temp) %>%
+  marginplot(delimiter = "imp") 
+## The quality is not great because replacing all the values with the mean, does not give an accurate representation in relation to sea_surface_temp. There is a significant anomoly on the line that best fits due to the amount of means imputated. 
+```
+Question 3 B)
+Perform median imputation on air temp. Assess the quality of the me-
+dian imputation using the margin plot by examining the correlation of the
+imputed air temp variable on X with sea surface temp on Y 
+
+```{r}
+tao_median <- read.csv("homework_6_tao.csv")
+tao_imp_med <- tao_median %>%
+  mutate(tao_air_imp_median = ifelse(is.na(air_temp), T, F)) %>%
+  mutate(air_temp = ifelse(is.na(air_temp), median(air_temp, na.rm = TRUE), air_temp)) 
+View(tao_imp_med)
+tao_imp_med %>%
+  select(air_temp, sea_surface_temp) %>%
+  marginplot(delimiter = "imp") 
+### This is not an accurate representation, for similar reasons as the mean imputation. You have a significant discrepency of medians when compared to the sea_surface_temperature. 
+```
+### Question 3 C)
+Perform kNN imputation on humidity. Choose k = 5, k = 15, and k =
+30. Assess the quality of the kNN imputation using the margin plot of
+sea surface temp on X vs humidity on Y . Which one of the three k
+values seems to capture most variation in the data?
+
+```{r}
+
+### K = 5
+library(VIM)
+tao_knn <- read.csv("homework_6_tao.csv")
+missing_count <- colSums(is.na(tao_knn))
+print(missing_count)
+tao_knn_imp <- kNN(tao_knn, ## K = 5 default
+                  variable = c("humidity","sea_surface_temp"), 
+                  numFun = weighted.mean, 
+                  weightDist = TRUE)
+View(tao_knn_imp)
+
+tao_knn_imp %>%
+  select(humidity, sea_surface_temp) %>%
+  marginplot(delimiter = "imp") 
+### K = 15
+tao_knn_15 <- read.csv("homework_6_tao.csv")
+tao_knn_imp_15 <- kNN(tao_knn_15, k = 15,
+                  variable = c("humidity","sea_surface_temp"), 
+                  numFun = weighted.mean, 
+                  weightDist = TRUE)
+View(tao_knn_imp_15)
+
+tao_knn_imp_15 %>%
+  select(humidity, sea_surface_temp) %>%
+  marginplot(delimiter = "imp") 
+### K = 30
+tao_knn_30 <- read.csv("homework_6_tao.csv")
+tao_knn_imp_30 <- kNN(tao_knn_30, k = 30,
+                  variable = c("humidity","sea_surface_temp"), 
+                  numFun = weighted.mean, 
+                  weightDist = TRUE)
+View(tao_knn_imp_30)
+
+tao_knn_imp_30 %>%
+  select(humidity, sea_surface_temp) %>%
+  marginplot(delimiter = "imp") 
+### K = 5 seems to capture the most variation in the data set, as K increased it shifted to right, but appeared to be more focused in bunches as seen in the margin plots. K = 15 and K= 30 appeared to show less variance of the data, and started to appear closer to a median or mean imputation. 
+```

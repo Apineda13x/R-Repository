@@ -1,0 +1,105 @@
+---
+title: "Homework 1"
+author: "Alberto Pineda"
+date: "2023-04-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+```
+### Question 1
+Assign a value 50 to a variable named x. Print out the value of x.
+
+``` {r}
+x <- 50
+x
+```
+### Question 2
+Assign a value 42 to a variable named my var1. Examine the data type of the
+variable my var1. Assign a value ‘‘UCD’’ to a variable named my var2. Ex-
+amine the data type of the variable my var2. Assign a value FALSE to my var3.
+Examine the data type of the variable my var3
+
+```{r}
+var1 <- 42
+typeof(var1)
+
+var2 <- "UCD"
+typeof(var2)
+
+var3 <- FALSE
+typeof(var3)
+```
+### Question 3
+Assign a value of 34 to a variable a. Coerce this variable to a character.
+
+```{r}
+a <- 34
+a
+typeof(a)
+a <- as.character(a)
+typeof(a)
+a
+```
+### Question 4
+Assign a value T to a variable b. Coerce this variable to a character.
+
+```{r}
+b <- T
+typeof(b)
+b <- as.character(b)
+b
+typeof(b)
+
+```
+### Question 5
+Coerce the character vector c(‘‘1’’, ‘‘0’’, ‘‘1’’, ‘‘0’’, ‘‘0’’) to log-
+ical. Hint: First create this vector and store it in a variable (in an object).
+Then use coercion.
+
+```{r}
+vec <- c("1","0","1","0","0")
+typeof(vec)
+num <- as.numeric(vec)
+typeof(num)
+log <- as.logical(num)
+typeof(log)
+log
+```
+### Question 6
+Create a vector containing the names of the months – Jan, Feb, ..., Dec.
+Coerce this vector to nominal and ordinal factors.
+
+```{r}
+vec <- c("Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct","Nov","Dec")
+typeof(vec)
+
+nom_vec <- factor(vec)
+class(nom_vec)
+nom_vec
+ord_vec <- factor(vec, ordered = TRUE,
+                  levels = c("Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct","Nv","Dec"))
+ord_vec
+class(ord_vec)
+
+```
+### Question 7
+Create a variable that stores the value of 3^2*4^1/8
+
+```{r}
+answer <- 3^2 * 4^(1/8)
+answer
+```
+### Question 8
+Using R, verify that
+6x + 42
+34.2−3.62 = 29.50556
+when x = 2.3.
+
+```{r}
+x = 2.3
+typeof(x)
+
+answer <- (6*x+42)/(3^(4.2-3.62))
+answer
+```

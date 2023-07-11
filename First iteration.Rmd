@@ -1,0 +1,95 @@
+---
+title: "Final Project "
+author: "Team "
+date: "2023-05-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(rio)
+library(xlsx)
+library(dplyr)
+rawdata <- import_list("combined_sales.xlsx", rbind = T)
+rawdata <- mutate(rename(rawdata, Year = "_file"), Year = Year + 2009 )
+names(rawdata) <- c("Month","Day","Noblesville-Price","Noblesville-Quantity", "Year", "Bloomington-Price","Bloomington-Quantity", "Muncie-Price","Muncie-Quantity","South_Bend-Price","South_Bend-Quantity","Fort_Wayne-Price","Fort_Wayne-Quantity")
+rawdata <- filter(rawdata, row_number() != 1)
+rawdata$Date <- paste(rawdata$Year, rawdata$Month,rawdata$Day, sep = "-")
+rawdata <- rawdata[, -c(1,2,5)]
+
+rows_to_delete <- c()
+for (i in 1:nrow(rawdata)) {
+  for (j in 1:ncol(rawdata)) {
+  if ("price" %in% as.character(rawdata[i, j])) {
+    rows_to_delete <- c(rows_to_delete, i)
+    break
+  }
+ }
+}
+rawdata <- rawdata[-rows_to_delete,]
+View(rawdata)
+
+```
+```{r}
+rawdata$Price <- paste(rawdata$`Noblesville-Price`,rawdata$`Bloomington-Price`,rawdata$`Muncie-Price`,rawdata$`South_Bend-Price`,rawdata$`Fort_Wayne-Price`, sep = "-")
+View(rawdata)
+```
+
+```{r}
+merged_df_1 <- rbind(data.frame(Noblesville_Price = paste(rawdata$`Noblesville-Price`, rawdata$Date, sep = "$Noblesville#")))
+merged_df_2 <- rbind(data.frame(Bloomington_Price = paste(rawdata$`Bloomington-Price`, rawdata$Date, sep = "$Bloomington#")))
+merged_df_3 <- rbind(data.frame(Muncie_Price = paste(rawdata$`Muncie-Price`, rawdata$Date, sep = "$Muncie#")))
+merged_df_4 <- rbind(data.frame(South_Bend_Price = paste(rawdata$`South_Bend-Price`, rawdata$Date, sep = "$South_Bend#")))
+merged_df_5 <- rbind(data.frame(Fort_Wayne_Price = paste(rawdata$`Fort_Wayne-Price`, rawdata$Date, sep = "$Fort_Wayne#")))
+
+first_combined_df <- cbind(merged_df_1,merged_df_2,merged_df_3,merged_df_4,merged_df_5)
+second_combined_df <- rbind(data.frame(Price = first_combined_df$Noblesville_Price),
+                           data.frame(Price = first_combined_df$Bloomington_Price),
+                           data.frame(Price = first_combined_df$Muncie_Price),
+                           data.frame(Price = first_combined_df$South_Bend_Price),
+                           data.frame(Price = first_combined_df$Fort_Wayne_Price))
+third_combined_df <- rbind(data.frame(Quantity = rawdata$`Noblesville-Quantity`),
+                           data.frame(Quantity = rawdata$`Bloomington-Quantity`),
+                           data.frame(Quantity = rawdata$`Muncie-Quantity`),
+                           data.frame(Quantity = rawdata$`South_Bend-Quantity`),
+                           data.frame(Quantity = rawdata$`Fort_Wayne-Quantity`))
+Final_Combine <- cbind(second_combined_df,third_combined_df)
+
+View(Final_Combine)
+```
+
+```{r}
+
+Final_Combine$Region <- sapply(strsplit(Final_Combine$Price,"\\$"), "[", 2)
+Final_Combine$Price <- sub("\\$.*","",Final_Combine$Price)
+
+View(Final_Combine)
+```
+
+```{r}
+Final_Combine$Date <- sapply(strsplit(Final_Combine$Region,"#"), "[", 2)
+Final_Combine$Region <- sub("#.*","",Final_Combine$Region)
+View(Final_Combine)
+write.xlsx(Final_Combine, 'test.xlsx')
+```
+
+```{r}
+str(Final_Combine)
+```
+```{r}
+Final_Combine <- Final_Combine[complete.cases(Final_Combine),]
+Final_Combine$Price <- as.numeric(sub("\\$","",Final_Combine$Price))
+Final_Combine$Price <- round(Final_Combine$Price, 2)
+
+Final_Combine$Quantity <- as.numeric(Final_Combine$Quantity)
+Final_Combine$Quantity <- round(Final_Combine$Quantity, 2)
+Final_Combine$Date <- as.Date(Final_Combine$Date, format = "%Y-%m-%d")
+
+View(Final_Combine)
+str(Final_Combine)
+write.xlsx(Final_Combine, 'test.xlsx', row.names = F)
+
+```

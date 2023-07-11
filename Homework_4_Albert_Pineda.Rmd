@@ -1,0 +1,223 @@
+---
+title: "Homework 4"
+author: "Alberto Pineda"
+date: "2023-05-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Question 1
+Create a dataset containing two columns: Method A and Method B. Populate
+the column Method A with values 1 through 9 and column Method B with values
+10 through 18
+
+```{r}
+Method_A <- c(1,2,3,4,5,6,7,8,9)
+Method_B <- c(10,11,12,13,14,15,16,17,18)
+dataset <- data.frame(Method_A = Method_A, Method_B = Method_B)
+dataset
+```
+### Question 1 A)
+Using apply(), find the row means.
+```{r}
+Row_mean <- apply(dataset, 1,  mean)
+Row_mean
+```
+### Question 1 B)
+Using apply(), find the column means
+```{r}
+Col_mean <- apply(dataset, 2,  mean)
+Col_mean
+```
+### Question 1 C)
+Using apply(), find the column sums
+```{r}
+Col_sum <- apply(dataset, 2,  sum)
+Col_sum
+```
+### Question 1 D)
+Using apply(), sort the columns.
+```{r}
+Col_sort <- apply(dataset, 2,  sort)
+Col_sort
+```
+### Question 1 E)
+Using apply(), find the product in each row.
+```{r}
+Row_Prod <- apply(dataset, 1,  prod)
+Row_Prod
+```
+### Question 1 F)
+Print the columns of the dataset using the apply() function
+```{r}
+apply(dataset, 2, function(x) print(x))
+```
+### Question 1 G)
+Find the length of the dataset columns using the apply() function
+```{r}
+col_lengths <- apply(dataset,2, length)
+col_lengths
+```
+### Question 1 H)
+Use apply() to find the range of numbers in each column of the dataset.
+```{r}
+col_range <- apply(dataset,2, range)
+col_range
+```
+### Question 2 A)
+Use tapply() function to find the mean mileage per number of cylinders.
+```{r}
+View(mtcars)
+tapply(mtcars$mpg, mtcars$cyl, mean)
+```
+### Question 2 B)
+Use tapply() function to find the mean weight per number of cylinders
+```{r}
+tapply(mtcars$wt, mtcars$cyl, mean)
+```
+### Question 2 C)
+Use tapply() function to find the mean mileage per type of transmission
+(auto or manual).
+```{r}
+tapply(mtcars$mpg, mtcars$am, mean)
+```
+### Question 2 D)
+Use tapply() function to find the mean mileage per number of gears.
+```{r}
+tapply(mtcars$mpg, mtcars$gear, mean)
+```
+### Question 3 A)
+Split the data set into separate parts split by Education.
+```{r}
+library(tidyr)
+mortgage <- read.csv("homework_4_mortgagelending.csv")
+mortgage
+splitmortgage <- split(mortgage, mortgage$Education)
+splitmortgage
+```
+
+### Question 3 B)
+Using the lapply function, examine the first 3 rows of every element in the
+list.
+```{r}
+lapply(splitmortgage, head, n=3)
+```
+
+### Question 3 C)
+Using the lapply function, determine the mean Age, Mortgage, and Income
+by writing a custom function
+```{r}
+myMean <- function(df) {
+  mean <- apply(df[, c("Age", "Mortgage", "Income")], 2, mean, na.rm = TRUE)
+  rounded_mean <- round(mean, 2)
+}
+
+lapply(splitmortgage, myMean)
+
+```
+### Question 3 D)
+Format the output of part c) above by using the sapply function
+```{r}
+sapply(splitmortgage, myMean)
+```
+### Question 4 A)
+Create a tibble object named air from the airquality data set.
+```{r}
+library(tidyverse)
+air <- as.tibble(airquality)
+str(air)
+air
+```
+### Question 4 B)
+Sort the data by the Wind column
+```{r}
+air <- arrange(air, Wind)
+air
+```
+### Question 4 B)
+Remove any rows for which the Ozone column has a missing value.
+```{r}
+air <- filter(air, Ozone != is.na(air$Ozone))
+air
+```
+### Question 4 C)
+Remove the Solar.R column and create a new column containing the ratio
+of Ozone to Wind
+```{r}
+air <- select(air, Ozone, Wind, Temp, Month, Day)
+air
+air <- mutate(air, OzoneWind_Ratio = Ozone/Wind)
+air
+```
+Question 4 E)
+Create a subset of the original airquality data containing just three columns:
+Month, Day, and Solar.R. The data should only contain data for June and
+July. Name the output solar
+```{r}
+solar <- subset(airquality, select = c(Month, Day, Solar.R))
+solar
+solar <- filter(solar, Month == 6:7)
+solar
+```
+### Question 4 F
+Merge the air and solar data sets together, retaining all records from the
+air data set (that is, a left join)
+```{r}
+Newair <- left_join(air, solar, copy = F)
+Newair
+```
+Question 4 G)
+Calculate the median Ozone value by Month for the merged data
+```{r}
+tapply(Newair$Ozone, Newair$Month, median)
+```
+### Question 5 A)
+Import the data into R. Then view the dataset using the native viewer in
+RStudio
+```{r}
+Who_hw <- read.csv("homework_4_who.csv")
+str(Who_hw)
+```
+### Question 5 B)
+Gather the codes in columns 5 through 61 into a single column named
+Code. Store the values in the column Value. Hint: Use the gather() or
+the pivot longer() function
+```{r}
+library(tidyverse)
+Who_hw <- pivot_longer(Who_hw, 5:60, names_to = "Code")
+Who_hw
+```
+### Question 5 C)
+Split the Code variable into the following variables: new, type, sexage.
+Hint: Use the separate() function
+```{r}
+library(tidyverse)
+Who_hw <- separate(Who_hw, Code, into = c("New","Type","sexage"), sep = "_")
+Who_hw
+```
+### Question 5 D)
+Split the variable sexage into two – one containing the sex and the second
+containing the age. Hint: Use the separate() function.
+```{r}
+whosep <- separate(Who_hw, sexage, into = c("Sex","Age"), sep = 1)
+whosep
+
+```
+### Question 5 E)
+Spread the type into its own columns. Hint: Use the spread() or pivot wider()
+function.
+```{r}
+library(tidyverse)
+whopiv <- pivot_wider(whosep, names_from = "Type")
+whopiv
+```
+### Question 5 F)
+Combine the Country and the ISO3 variables into one variable Country ISO.
+Hint: Use the unite() function.
+```{r}
+FinalWho <- unite(whopiv, col = "Country_Iso", iso3, country, sep = "-", remove = T)
+FinalWho
+```

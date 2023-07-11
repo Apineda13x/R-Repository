@@ -1,0 +1,218 @@
+---
+title: "Homework 2"
+author: "Alberto Pineda"
+date: "2023-04-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Question 1
+Create a vector of monthly returns from holding two stocks. Call the first vector stock1 containing only the values of the returns and
+not the month names. Returns for the first nine months are:
+a)
+January: +$2000 February: +$4000 March: -$500 April: -$1000 May: +$7000 June: +$7500 July: -$800 August: +$5500 September: -$1000
+b) Call the second vector stock2 containing only the values of the returns and
+not the month names. Returns for the first nine months are:
+January: +$3000 February: -$400 March: -$500 April: +$1000 May: -$700 June: +$7500 July: +$1250 August: +$6500 September: +$1000
+c) Create a vector called months for storing month names - January, Febru-
+ary,..., September.
+d) Assign names of the months to the stock1 and stock2 vectors.
+e) Create a vector total monthly to hold the total monthly gains or losses
+from holding both stocks.
+f)what is the total gain/loss over the last nine months from both the stocks?
+Store this in a vector named total nine months
+g) Check to see if the total returns from stock1 exceeds total returns from
+stock2
+h) Store the return of stock1 for March in stock1 March
+i) Store the return of stock2 for September in stock2 Sept.
+j) Store the returns from the second quarter (April, May, June) for stock1.
+Assign the values to a vector named stock1 Q2.
+k) Store the returns from the second quarter (April, May, June) for stock2.
+Assign the values to a vector named stock2 Q2.
+l)Find the mean return from stock1 and stock2 for the third quarter (July,
+August, and September).
+m) When are the returns from stock1 positive?
+n) When are the returns from stock2 positive?
+
+``` {r}
+stock1 <- c(2000,4000,-500,-1000,7000,7500,-800,5500,-1000) ### Part A
+
+stock2 <- c(3000,-400,-500,1000,-700,7500,1250,6500,1000) ### Part B
+
+stock1 ### Part A
+stock2 ### Part B
+
+months <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep" ) ### Part C
+months ### Part C
+
+names(stock1) <- months ### Part D
+names(stock2) <- months ### Part D
+
+total_monthly <- stock1 + stock2 ### Part E
+
+total_monthly ### Part E
+
+total_stock1 <- sum(stock1) ### Part F
+total_stock2 <- sum(stock2) ### Part F
+
+total_9_months <- total_stock1 + total_stock2 ### Part F
+total_9_months ### Part F
+
+test_total <- sum(total_monthly) ### Part F
+test_total ### Part F
+
+total_stock1 > total_stock2 ### Part G, Total Returns from stock1 DO exceed stock2
+
+stock1_March <- stock1["Mar"] ### Part H
+stock1_March ### Part H
+
+stock2_Sept. <- stock2["Sep"] ### Part I
+stock2_Sept. ### Part I
+
+Stock1_Q2 <- stock1[c("Apr","May","Jun")] ### Part J
+Stock1_Q2 ### Part J
+
+Stock2_Q2 <- stock2[c("Apr","May","Jun")] ### Part K
+Stock2_Q2 ### Part K
+
+Stock1_Q3 <- stock1[c("Jul","Aug","Sep")] ### Part L
+Stock2_Q3 <- stock2[c("Jul","Aug","Sep")] ### Part L
+mean(sum(Stock1_Q3)) ### Part L
+mean(sum(Stock2_Q3)) ### Part L
+
+Positive_Stock1 <- which(stock1 > 0) ### Part M
+Positive_Stock2 <- which(stock2 > 0) ### Part N
+Positive_Stock1 ### Part M
+Positive_Stock2 ### Part N
+
+```
+### Question 2
+a) Create the following matrix using R. Name the matrix product sales.
+Product1 sales in AMER = 4000
+Product1 sales in APAC = 5000
+Product1 sales in EMEA = 4000
+
+Product2 sales in AMER = 6000
+Product2 sales in APAC = 5000
+Product2 sales in EMEA = 7000
+
+Product3 sales in AMER = 5400
+Product3 sales in APAC = 6500
+Product3 sales in EMEA = 8500
+
+Product4 sales in AMER = 4000
+Product4 sales in APAC = 5500
+Product4 sales in EMEA = 4300
+b) Name the rows of the matrix as P1, P2, P3, and P4. Name the columns as
+AMER, APAC, and EMEA.
+c) Calculate the worldwide product sales for each product. Hint: Use rowSums().
+Add this information to the product sales matrix as the last column.
+Name the column Total Sales. Hint: Use cbind().
+d) Calculate the product sales for each product by geos. Hint: Use colSums().
+Add this information to the product sales matrix as the last row. Name
+the row Total Sales. Hint: Use rbind().
+e) Select the APAC sales for all four products.
+f) Select the worldwide sales for P3 (across all 3 geos).
+g) What are the sales for P3 in APAC.
+
+```{r}
+Product1 <- c(4000,5000,4000) ### Part A
+Product2 <- c(6000,5000,7000) ### Part A
+Product3 <- c(5400,6500,8500) ### Part A
+Product4 <- c(4000,5500,4300) ### Part A
+
+products <- c(Product1,Product2,Product3,Product4) ### Part A
+product_sales_matrix <- matrix(products, byrow =TRUE, nrow = 4) ### Part A
+product_sales_matrix ### Part A
+
+region <- c("AMER","APAC","EMEA") ### Part B
+names <- c("P1","P2","P3","P4") ### Part B
+
+colnames(product_sales_matrix) <- region ### Part B
+rownames(product_sales_matrix) <- names ### Part B
+product_sales_matrix ### Part B
+
+Total_Sales <- rowSums(product_sales_matrix) ### Part C 
+Total_Sales ### Part C
+product_sales_matrix <- cbind(product_sales_matrix,Total_Sales) ### Part C
+product_sales_matrix ### Part C
+
+Total_Sales_Geo <- colSums(product_sales_matrix) ### Part D
+product_sales_matrix <- rbind(product_sales_matrix, Total_Sales_Geo) ### Part D
+product_sales_matrix ### Part D
+
+product_sales_matrix[, "APAC"] ### Part E
+
+product_sales_matrix["P3", "Total_Sales"] ### Part F
+
+product_sales_matrix["P3","APAC"] ### Part G
+``` 
+### Question 3
+Generate the following table as a data frame in R.
+Patient Pulse Rate Body temperature Weight
+A 70 98 175
+B 68 99 182
+C 75 100.8 192
+D 59 100.2 165
+E 60 99 156
+F 72 101.0 155
+G 72 100.7 167
+H 68 97 169
+I 75 101.5 171
+Use the dataframe created to answer the following questions. Each question is
+independent of the prior questions.
+a) Display the first 3 rows of the data frame.
+b) Display the last 3 rows of the data frame.
+c) Display the structure of the data frame.
+d) Sort the data frame by Body temperature in a descending order.
+e) Sort the original data frame by Weight in an ascending order.
+f) Return all patients whose Body temperature is greater than 100.
+
+g) Return all patients whose Pulse Rate is less than 70.
+
+h) Return all patients whose Weight is more than 170 and Pulse Rate exceeds
+70.
+
+i) Return the data frame displaying the last three columns and last three rows.
+
+j) Display only the Pulse Rate column but all the rows.
+
+k) Display only the Pulse Rate and the Weight columns but all the rows.
+
+```{r}
+
+df_Patient <- data.frame("Patient" = c("A","B","C","D","E","F","G","H","I"),
+                         Pulse_Rate = c(70,68,75,59,60,72,72,68,75),
+                         Body_Temp = c(98,99,100.8,100.2,99,101.0,100.7,97,101.5),
+                         Weight = c(175,182,192,165,156,155,167,169,171))
+df_Patient
+
+head(df_Patient, n = 3) ### Part A
+tail(df_Patient, n = 3) ### Part B
+str(df_Patient) ### Part C
+
+temp_descending <- order(df_Patient$Body_Temp, decreasing = TRUE) ### Part D
+df_Patient[temp_descending, ] ### Part D
+
+weight_ascending <- order(df_Patient$Weight, decreasing = FALSE) ### Part E
+df_Patient[weight_ascending, ] ### Part E
+
+df_Patient[df_Patient$Body_Temp > 100, ] ### Part F
+
+df_Patient[df_Patient$Pulse_Rate < 70, ] ### Part G
+
+df_Patient[df_Patient$Weight > 170 & df_Patient$Pulse_Rate > 70,] ### Part H
+
+df_Patient[7:9, 2:4] ### Part I
+
+df_Patient[1:9, "Pulse_Rate", drop = FALSE] ### Part J
+
+df_Patient[1:9, c(2, 4)] ### Part K
+
+
+
+
+```

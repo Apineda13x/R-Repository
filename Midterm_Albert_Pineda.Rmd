@@ -1,0 +1,141 @@
+---
+title: "Midterm Exam"
+author: "Alberto Pineda"
+date: "2023-05-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Question 1
+Assign a value 150 to a variable named y. Print out the value of y.
+```{r}
+y <- 150
+y
+```
+### Question 2
+Consider the vector c(1, 3, NA, 8, 5, NA, 3). Determine the sum of the
+values in the vector.
+
+```{r}
+vec <- c(1, 3, NA, 8, 5, NA, 3)
+sum(vec, na.rm = TRUE)
+```
+### Question 3
+Generate the following table as a data frame in R. Then use the ifelse statement
+to add a new column named Temp 2 to the data frame. This column should
+display High for temperatures of 100◦F and over and display Normal for other
+values.
+Patient Pulse Rate Body temperature Weight
+A 70 98 175
+B 68 99 182
+C 75 100.8 192
+D 59 100.2 165
+E 60 99 156
+F 72 101.0 155
+G 72 100.7 167
+H 68 97 169
+I 75 101.5 171
+
+```{r}
+df_Patient <- data.frame("Patient" = c("A","B","C","D","E","F","G","H","I"),
+                         Pulse_Rate = c(70,68,75,59,60,72,72,68,75),
+                         Body_Temp = c(98,99,100.8,100.2,99,101.0,100.7,97,101.5),
+                         Weight = c(175,182,192,165,156,155,167,169,171))
+df_Patient$Temp_2 <- ifelse(df_Patient$Body_Temp > 100, "High", "Normal")
+df_Patient
+```
+### Question 4
+Use this URL to download the Sacramento weather data. https://academic.
+udayton.edu/kissock/http/Weather/gsod95-current/CASACRAM.txt.
+```{r}
+library(readr)
+
+url <- "https://academic.udayton.edu/kissock/http/Weather/gsod95-current/CASACRAM.txt"
+weather <- read_table(url, col_names = c("Month", "Day", "Year", "Temp"))
+View(weather)
+```
+### Question 5
+The Wall Street Journal CEO Compensation Study analyzed CEO pay for many
+U.S. companies with fiscal year 2008 revenue of at least $5 billion that filed their
+proxy statements between October 2008 and March 2009. The data are in the
+CSV file Question 5.
+
+Part a)Read the CSV file into the R environment.
+
+```{r}
+Comp <- read.csv("2114e0b0-829f-488c-8706-ba2b1a1f796d.csv")
+View(Comp)
+```
+### Part B)
+Create a new variable that is the sum of Salary 2008 and Bonus 2008.
+Name this new variable Total Compensation. Add this new variable to
+the data frame created in part a) above.
+```{r}
+Comp$Salary_Clean <- as.numeric(gsub("\\$|,","", Comp$Salary.2008))
+Comp$Bonus_Clean <- as.numeric(gsub("\\$|,","", Comp$Bonus.2008))
+View(Comp)
+Comp$TotalCompensation <- rowSums(Comp[,c("Bonus_Clean","Salary_Clean")])
+Comp$TotalCompensationFormatted <- paste("$", format(Comp$TotalCompensation, big.mark = ",", decimal.mark = "."), sep = "")
+View(Comp)
+```
+### Part C)
+Display the first 3 rows of the data frame
+```{r}
+head(Comp, n = 3)
+```
+### Part D)
+```{r}
+tail(Comp, n = 3)
+```
+### Part E)
+Display the structure of the data frame
+```{r}
+str(Comp)
+```
+### Part F)
+How many rows are in the data frame?
+```{r}
+nrow(Comp)
+```
+### Part G)
+Sort the data frame by Total Compensation in descending order. Who
+earned the largest compensation?
+
+```{r}
+TotalCompDescending <- order(Comp$TotalCompensation, decreasing = T)
+Comp[TotalCompDescending,]
+### Laurence D. Fink earned the largest compensation at $17,649,500
+```
+### Part H)
+Retrieve all the rows where the Total Compensation is greater than $10
+million
+```{r}
+Comp[Comp$TotalCompensation > 10000000,]
+```
+### Part I)
+Return the rows for the CEO compensation for the CEOs in the Financials
+sector
+```{r}
+Comp[Comp$Company.Type == "Financials",]
+```
+### Part J)
+Return the rows for the CEO compensation for the CEOs in the Health
+Care or the Technology sectors.
+```{r}
+Comp[Comp$Company.Type == "Technology" | Comp$Company.Type == "Health Care",]
+```
+### Part K)
+Sort the data frame by Company Type ascending and Total Compensation
+descending.
+
+```{r}
+Comp[order(Comp$Company.Type, -Comp$TotalCompensation),]
+View(Comp[order(Comp$Company.Type, -Comp$TotalCompensation),])
+```
+
+
+
+

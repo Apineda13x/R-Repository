@@ -1,0 +1,192 @@
+---
+title: "Homework 5"
+author: "Alberto Pineda"
+date: "2023-05-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Question 1
+A)
+Generate numerical summaries (mean, median, standard deviation, range,
+minimum, maximum, and total) for the length of time the shopper spends
+on the web site, the number of pages viewed, and the amount spent per
+transaction. Discuss what you learn about Millie’s Chocolates’ online shop-
+pers from these numerical summaries.
+
+```{r}
+library(tidyverse)
+millies <- read.csv("homework_5_question_1.csv")
+View(millies)
+str(millies)
+summarylot <- summarize(millies, mean_lot = mean(millies$Time..min.), median_lot = median(millies$Time..min.), sd_lot = sd(millies$Time..min.), range_lot = range(millies$Time..min.), min_lot = min(millies$Time..min.), max_lot = max(millies$Time..min.), total_lot = sum(millies$Time..min.) )
+summarypages <- summarize(millies, mean_pages = mean(millies$Pages.Viewed), median_pages = median(millies$Pages.Viewed), sd_pages = sd(millies$Pages.Viewed), range_pages = range(millies$Pages.Viewed), min_pages = min(millies$Pages.Viewed), max_pages = max(millies$Pages.Viewed), total_pages = sum(millies$Pages.Viewed) )
+summaryspent <- summarize(millies, mean_spent = mean(millies$Amount.Spent....), median_spent = median(millies$Amount.Spent....), sd_spent = sd(millies$Amount.Spent....), range_spent = range(millies$Amount.Spent....), min_spent = min(millies$Amount.Spent....), max_spent = max(millies$Amount.Spent....), total_spent = sum(millies$Amount.Spent....) )
+View(summarylot)
+View(summarypages)
+View(summaryspent)
+```
+### Question 1 A) 
+The average time someone spent on the millies website was 12.81 minutes, where they would spend $68.12 on average. Additionally the customers would on average spend their time on 4.82 pages. The Standard deviation of money spent was 32.3 which means 68% of transactions fall within approximately $100 and 98% of transactions fall within approximately $132.34. The max spent was 158 which fell within the third standard deviations. 
+
+### Question 1 B)
+summarize the frequency, the total dollars spent, and the mean amount
+spent per transaction for each day of week. Discuss the observations you
+can make about Millie’s Chocolates’ business based on the day of the week.
+
+```{r}
+dailysummary <- summarize(group_by(millies, Day), 
+    frequency = n())
+    
+meandaily <- tapply(millies$Amount.Spent...., millies$Day, mean)
+sumdaily <- tapply(millies$Amount.Spent...., millies$Day, sum)
+
+dailysummary$Mean <- meandaily
+dailysummary$Sum <- sumdaily
+
+View(dailysummary)
+
+```
+### Question 1 B)
+The daily data shows us that Friday and Monday are the busiest days. While Monday has the higher mean spend, Friday due to larger frequence has a large overall daily spend. Sunday and Thursday are very both the lowest frequency and demonstrate the lowest amount of sales. 
+
+### Question 1 C)
+Summarize the frequency, the total dollars spent, and the mean amount
+spent per transaction for each type of browser. Discuss the observations you
+can make about Millie’s Chocolates’ business based on the type of browser.
+
+```{r}
+
+dailysummary2 <- summarize(group_by(millies, Browser), 
+    frequency = n())
+    
+meandaily2 <- tapply(millies$Amount.Spent...., millies$Browser, mean)
+sumdaily2 <- tapply(millies$Amount.Spent...., millies$Browser, sum)
+
+dailysummary2$Mean <- meandaily2
+dailysummary2$Sum <- sumdaily2
+
+View(dailysummary2)
+```
+### Question 1 C)
+The primary Browser used is Chrome by a significant margin. Users that were on chrome spent less on average but spent more overall, primarily due to user count. Fireofx and other browsers were close on mean spend, but found themselves short overall due to less users purchasing from those browsers. 
+
+### Question 2)
+A)
+```{r}
+
+melvyl <- read.csv("homework_5_question_2.csv")
+View(melvyl)
+str(melvyl)
+frequency_items <- table(melvyl$Items)
+frequency_sales <- table(melvyl$Net.Sales)
+frequency_payment_method <- table(melvyl$Method.of.Payment)
+frequency_gender <- table(melvyl$Gender)
+frequency_marital_status <- table(melvyl$Marital.Status)
+frequency_age <- table(melvyl$Age)
+frequency_type <- table(melvyl$Type.of.Customer)
+
+View(frequency_items)
+View(frequency_sales)
+View(frequency_payment_method)
+View(frequency_gender)
+View(frequency_marital_status)
+View(frequency_age)
+```
+```{r}
+mean_sales_payment <- tapply(melvyl$Net.Sales, melvyl$Method.of.Payment, mean)
+sum_sales_payment <- tapply(melvyl$Net.Sales, melvyl$Method.of.Payment, sum)
+mean_items_sales <- tapply(melvyl$Net.Sales, melvyl$Items, mean)
+sum_items_sales <- tapply(melvyl$Net.Sales, melvyl$Items, sum)
+mean_age_sales <- tapply(melvyl$Net.Sales, melvyl$Age, mean)
+sum_age_sales <- tapply(melvyl$Net.Sales, melvyl$Age, sum)
+View(mean_sales_payment)
+View(sum_sales_payment)
+View(mean_items_sales)
+View(sum_items_sales)
+View(mean_age_sales)
+View(sum_age_sales)
+```
+
+```{r}
+frequency_type <- table(melvyl$Type.of.Customer)
+View(frequency_type)
+```
+
+```{r}
+library(tidyverse)
+melvyl$Type_Value <- ifelse(melvyl$Type.of.Customer == "Promotional", 1 ,0)
+melvyl_type1 <- sum(melvyl$Net.Sales[melvyl$Type_Value == 1])
+melvyl_type1$Promotional_Sales_Mean <- mean(melvyl$Net.Sales[melvyl$Type_Value == 1])
+melvyl_type1$Regular_Sales_Mean <- mean(melvyl$Net.Sales[melvyl$Type_Value == 0])
+melvyl_type1$Regular_Sales_Sum <- sum(melvyl$Net.Sales[melvyl$Type_Value == 0])
+crosstabulation <- tapply(melvyl$Type_Value, melvyl$Net.Sales, sum)
+crosstabulation2 <- tapply(melvyl$Type_Value, melvyl$Net.Sales, mean)
+View(melvyl_type1)
+View(crosstabulation)
+View(crosstabulation2)
+
+```
+Question 2 Analysis
+Melvyl had a successful promotion acquiring 70 customers through their promotion, and having 30 regular customers appear. A promotional customer on average spent more than a regular customer. The difference was a an average of $23 higher for a promotional customer. Additionally the amount of sales for a promotional customer far exceeded that of a regular customer, but this could be attributed to the higher frequency. Another interesting thing of note is that the majority of customers spent more using the proprietary card suggesting that customers using these cards are much more willing to spend more. An emphasis on promoting the proprietary card should be a priority for Melvyl. Another aspect of note is that while customers with large items counds did typically spend more, customers who purchased 7 items spent nearly as much as those who bought 10-17. Suggesting that those customers in the 10-17 range might be adding additional small items that are not substantially increasing their sales numbers. In terms of age, there was a high variance but a target age are customers in their early 50's who spend apoximately 165+, but it does slow down after age 54. Overall Melvy Ran a successful campaign with valuable insights. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
